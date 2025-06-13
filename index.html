@@ -24,7 +24,6 @@
       padding: 8px;
       width: 250px;
     }
-    
     .btn {
       margin-top: 15px;
       padding: 8px 16px;
@@ -54,6 +53,7 @@
       padding: 15px;
       border-radius: 8px;
       width: fit-content;
+      max-width: 800px;
     }
     .input-info {
       font-size: 0.9em;
@@ -61,243 +61,158 @@
       margin: 5px 0 10px 0;
       max-width: 600px;
     }
+    .plant-desc {
+      margin-top: 15px;
+    }
   </style>
 </head>
 <body>
   <h2>Agricultural Buffer Strip Recommender</h2>
 
-<div style="overflow: auto; max-width: 800px;">
+  <div style="overflow: auto; max-width: 800px;">
+    <div style="float: right; margin-left: 20px; margin-bottom: 10px; text-align: center;">
+      <img 
+        src="Willowtree.jpg" 
+        alt="Willow tree (Salix spp.)" 
+        width="400"
+        style="display: block; margin-bottom: 5px;">
+      <p style="font-size: 0.8em; color: #666; margin: 0;">
+        <i>Salix spp.</i> — Source: 
+        <a href="https://gardenerspath.com/plants/landscape-trees/best-willow-varieties" target="_blank" rel="noopener noreferrer">
+          Gardeners Path
+        </a>
+      </p>
+    </div>
 
-  <!-- Image and caption container -->
-  <div style="float: right; margin-left: 20px; margin-bottom: 10px; text-align: center;">
-    <img 
-      src="Willowtree.jpg" 
-      alt="Willow tree (Salix spp.)" 
-      width="400"
-      style="display: block; margin-bottom: 5px;">
-    
-    <p style="font-size: 0.8em; color: #666; margin: 0;">
-      <i>Salix spp.</i> — Source: 
-      <a href="https://gardenerspath.com/plants/landscape-trees/best-willow-varieties" target="_blank" rel="noopener noreferrer">
-        Gardeners Path
-      </a>
+    <!-- Form Inputs -->
+    <label for="slope">Field Slope:</label>
+    <p class="input-info">
+      The slope of a field influences how water and nutrients move across the land...
     </p>
+    <select id="slope">
+      <option value="lt10">&lt; 10 %</option>
+      <option value="gt10">&gt; 10 %</option>
+    </select>
+
+    <label for="fertilizer">Fertilizer Use:</label>
+    <p class="input-info">Fertilizer use affects nutrient runoff...</p>
+    <select id="fertilizer">
+      <option>Low</option>
+      <option>Moderate</option>
+      <option>High</option>
+    </select>
+
+    <label for="soil">Soil Type:</label>
+    <p class="input-info">Soil type influences water infiltration...</p>
+    <select id="soil">
+      <option>Clay</option>
+      <option>Sand</option>
+      <option>Loam</option>
+    </select>
+
+    <label for="rain">Annual Precipitation:</label>
+    <p class="input-info">Annual precipitation affects runoff and erosion risk...</p>
+    <select id="rain">
+      <option value="Dry">Dry (0–699 mm/year)</option>
+      <option value="Moderate">Moderate (700–1499 mm/year)</option>
+      <option value="Heavy">Heavy (&gt;1500 mm/year)</option>
+    </select>
+
+    <label for="distance">Distance to Water Body:</label>
+    <p class="input-info">Proximity to water bodies affects risk of pollution...</p>
+    <select id="distance">
+      <option value="lt10">&lt; 10 m</option>
+      <option value="10-30">10 – 30 m</option>
+      <option value="gt30">&gt; 30 m</option>
+    </select>
+
+    <button class="btn btn-primary" onclick="recommendBuffer()">Get Recommendation</button>
+    <button class="btn btn-secondary" onclick="resetForm()">Reset</button>
+
+    <div id="output"></div>
   </div>
 
- <!-- Select Fields -->
-  <label for="slope">Field Slope:</label>
-  <p class="input-info">
-    The slope of a field influences how water and nutrients move across the land. Fields with steep slopes 
-    (greater than 10%) have a higher risk of soil erosion and nutrient runoff, especially during heavy rainfall. <br><br>
-    You can estimate slope using topographic maps, digital elevation models (DEM), online tools like 
-    Google Earth, or GIS platforms (e.g. www.agraratlas.inspire.gv.at). Even smartphone apps can assist with on-site estimation.
-  </p>
-  <select id="slope">
-    <option value="lt10">< 10 %</option>
-    <option value="gt10">> 10 %</option>
-  </select>
-  
-  
-  <label for="fertilizer">Fertilizer Use:</label>
-  <p class="input-info">
-  Fertilizer use affects the amount of nitrogen and phosphorus that can be lost from fields into waterways. 
-  Higher use increases the risk of nutrient runoff, especially without proper buffer zones. <br><br>
-  You can estimate inorganic (chemical or mineral) fertilizer use based on your fertilization plan or farm records.
-  </p>
-  <select id="fertilizer">
-    <option>Low</option>
-    <option>Moderate</option>
-    <option>High</option>
-  </select>
-
-  <label for="soil">Soil Type:</label>
-  <p class="input-info">
-    Soil type influences water infiltration, erosion, and nutrient retention. For example, sandy soils drain quickly 
-    but hold fewer nutrients, while clay soils retain water and nutrients longer but can erode easily.<br><br>
-    You can determine your soil type using a soil survey, agricultural extension services, or by submitting a soil sample 
-    to a lab. Online tools like SoilGrids or local GIS databases (e.g. https://bodenkarte.at) may also help.<br><br>
-    Choose the dominant fraction in the topsoil — for example, if your soil is classified as sandy loam, select "Loam".
-  </p>
-  <select id="soil">
-    <option>Clay</option>
-    <option>Sand</option>
-    <option>Loam</option>
-  </select>
-
-  <label for="rain">Annual Precipitation:</label>
-  <p class="input-info">
-    Annual precipitation affects surface runoff and erosion risk. Areas with higher rainfall require wider buffer strips 
-    to manage water and nutrient flow. <br><br>
-    • <strong>Dry:</strong> 0–699 mm/year<br>
-    • <strong>Moderate:</strong> 700–1499 mm/year<br>
-    • <strong>Heavy:</strong> 1500+ mm/year<br><br>
-    You can find precipitation data from meteorological services, regional climate portals, or long-term farm records.
-    For Austria, you can find a map with mean annual precipitation values on the WebGIS application eHYD (https://ehyd.gv.at/).
-  </p>
-  <select id="rain">
-    <option value="Dry">Dry (0–699 mm/year)</option>
-    <option value="Moderate">Moderate (700–1499 mm/year)</option>
-    <option value="Heavy">Heavy (>1500 mm/year)</option>
-  </select>
-
-  <label for="distance">Distance to Water Body:</label>
-  <p class="input-info">
-    The proximity of a field to rivers, lakes, or ditches influences how quickly runoff can enter water bodies. 
-    Fields closer to water require stricter management to prevent pollution. <br><br>
-    You can estimate distance using field maps, aerial imagery, GIS tools, or simply measure with a rangefinder or app.
-  </p>
-  <select id="distance">
-    <option value="lt10">< 10 m</option>
-    <option value="10-30">10 – 30 m</option>
-    <option value="gt30">> 30 m</option>
-  </select>
-  
-  <button class="btn btn-primary" onclick="recommendBuffer()">Get Recommendation</button>
-  <button class="btn btn-secondary" onclick="resetForm()">Reset</button>
-  
-  <div id="output"></div>
-
-  <!-- JavaScript -->
   <script>
-     function resetForm() {
-        document.getElementById("slope").selectedIndex = 0;
-        document.getElementById("fertilizer").selectedIndex = 0;
-        document.getElementById("soil").selectedIndex = 0;
-        document.getElementById("rain").selectedIndex = 0;
-        document.getElementById("distance").selectedIndex = 0;
-        document.getElementById("output").innerHTML = "";
-      }
-    
+    const plantDescriptions = {
+      "Salix spp.": `
+        <div class="plant-desc">
+          <strong>Salix spp. (Willow):</strong>
+          <p>Fast-growing shrubs or trees found in moist environments. Extensive roots make them ideal for soil stabilization, erosion control, and nutrient uptake in riparian buffers.</p>
+        </div>`,
+
+      "Sambucus nigra, Viburnum opulus, Ulmus laevis, Alnus glutinosa, Carex riparia, Juncus effusus, Filipendula ulmaria, Lythrum salicaria": `
+        <div class="plant-desc">
+          <strong>Mixed Riparian Buffer Plants:</strong>
+          <p>Includes elderberry, guelder rose, white elm, alder, sedges, rushes, and flowering perennials. These species provide strong soil stabilization, nutrient filtering, and habitat diversity in moist to wet zones near water bodies.</p>
+        </div>`,
+
+      "Sambucus nigra, Quercus robur, Festuca pratensis, Lotus corniculatus, Achillea millefolium, Plantago lanceolata": `
+        <div class="plant-desc">
+          <strong>Diverse Buffer Vegetation:</strong>
+          <p>Combines woody plants like elder and oak with herbaceous species such as meadow fescue, trefoil, yarrow, and ribwort. Suitable for loamy soils and supports biodiversity, nitrogen fixation, and erosion control.</p>
+        </div>`,
+
+      "Festuca ovina, Anthyllis vulneraria, Bromus erectus, Poa angustifolia": `
+        <div class="plant-desc">
+          <strong>Dry-Site Grass Mix:</strong>
+          <p>Drought-tolerant grasses and legumes adapted to dry, sloped, or nutrient-poor conditions. Ideal for upper field areas with minimal water access.</p>
+        </div>`,
+
+      "Mixed native grasses and legumes": `
+        <div class="plant-desc">
+          <strong>General Purpose Buffer:</strong>
+          <p>Suitable for a wide range of conditions. Native grass-legume mixtures improve infiltration, support wildlife, and help trap sediment and nutrients.</p>
+        </div>`
+    };
+
+    function resetForm() {
+      document.getElementById("slope").selectedIndex = 0;
+      document.getElementById("fertilizer").selectedIndex = 0;
+      document.getElementById("soil").selectedIndex = 0;
+      document.getElementById("rain").selectedIndex = 0;
+      document.getElementById("distance").selectedIndex = 0;
+      document.getElementById("output").innerHTML = "";
+    }
+
     function recommendBuffer() {
-      // Get selected values
       const slope = document.getElementById("slope").value;
-      const slopeText = document.getElementById("slope").selectedOptions[0].text;
-      
       const fertilizer = document.getElementById("fertilizer").value;
       const soil = document.getElementById("soil").value;
       const rain = document.getElementById("rain").value;
-      
       const distance = document.getElementById("distance").value;
-      const distanceText = document.getElementById("distance").selectedOptions[0].text;
 
       let width = "";
-      const vegetationOptions = [];
+      let vegetationKey = "";
 
-      // Buffer Width Logic
       if (slope === "lt10") {
-        if (fertilizer === "Low") {
-          width = "3 meters";
-        } else if (fertilizer === "Moderate") {
-          width = "5 meters";
-        } else if (fertilizer === "High") {
-          width = "10 meters";
-        }
-      } else if (slope === "gt10") {
-        if (rain === "Dry") {
-          width = "5 meters";
-        } else if (rain === "Moderate") {
-          width = "10 meters";
-        } else if (rain === "Heavy") {
-          width = "12 meters";
-        }
-      }
-
-      // Vegetation recommendation logic
-      if (distance === "lt10") {
-        if (slope === "gt10") {
-          vegetationOptions.push("Salix spp.");
-        } else {
-          vegetationOptions.push("Sambucus nigra, Viburnum opulus, Ulmus laevis, Alnus glutinosa, Carex riparia, Juncus effusus, Filipendula ulmaria, Lythrum salicaria");
-        }
-      } else if (distance === "10-30" && soil === "Loam") {
-        vegetationOptions.push("Sambucus nigra, Quercus robur, Festuca pratensis, Lotus corniculatus, Achillea millefolium, Plantago lanceolata");
-      } else if (distance === "gt30" && (slope === "gt10" || rain === "Dry")) {
-        vegetationOptions.push("Festuca ovina, Anthyllis vulneraria, Bromus erectus, Poa angustifolia");
+        width = fertilizer === "Low" ? "3 meters" :
+                fertilizer === "Moderate" ? "5 meters" : "10 meters";
       } else {
-        vegetationOptions.push("Mixed native grasses and legumes");
+        width = rain === "Dry" ? "5 meters" :
+                rain === "Moderate" ? "10 meters" : "12 meters";
       }
 
-      const vegetation = vegetationOptions.join(", ");
+      if (distance === "lt10") {
+        vegetationKey = slope === "gt10"
+          ? "Salix spp."
+          : "Sambucus nigra, Viburnum opulus, Ulmus laevis, Alnus glutinosa, Carex riparia, Juncus effusus, Filipendula ulmaria, Lythrum salicaria";
+      } else if (distance === "10-30" && soil === "Loam") {
+        vegetationKey = "Sambucus nigra, Quercus robur, Festuca pratensis, Lotus corniculatus, Achillea millefolium, Plantago lanceolata";
+      } else if (distance === "gt30" && (slope === "gt10" || rain === "Dry")) {
+        vegetationKey = "Festuca ovina, Anthyllis vulneraria, Bromus erectus, Poa angustifolia";
+      } else {
+        vegetationKey = "Mixed native grasses and legumes";
+      }
 
-      const vegetationDescriptions = {
-  "Salix spp.": `<p>Salix spp. (Willow) are fast-growing shrub or tree species typically found in moist environments such as riparian zones, wetlands, and streambanks. Depending on the species, they can grow from 1.5–3 meters (shrubs) to over 15–20 meters tall (trees), with spreading root systems that can extend several meters both vertically and laterally. They are characterized by their high tolerance to waterlogging, ability to root easily from cuttings, and extensive fibrous roots that provide mechanical reinforcement to the soil. These traits make them particularly suitable for use in bioengineering, especially for soil stabilization, erosion control, and phytoremediation.</p>
-<p>In buffer strips near agricultural fields, willows effectively absorb excess nutrients (notably nitrogen and phosphorus), slow down surface runoff, promote infiltration and sedimentation, and provide ecological habitat for birds and insects. Their rapid growth, low maintenance requirements, and high biomass production make them an economically and ecologically sustainable solution for protecting water bodies and restoring degraded riparian landscapes.</p>`,
+      const vegetationHTML = plantDescriptions[vegetationKey] || "";
 
-  "Sambucus nigra, Viburnum opulus, Ulmus laevis, Alnus glutinosa, Carex riparia, Juncus effusus, Filipendula ulmaria, Lythrum salicaria": `
-<p> SAMBUCUS NIGRA (Black Elder):<p>
-<p style="margin: 0;">Sambucus nigra, commonly known as elderberry, is a fast-growing deciduous shrub or small tree typically found in hedgerows and areas with moist, nutrient-rich soils. It thrives in a wide range of conditions, from periodically flooded zones to drier fertile soils, particularly in sunny environments. The plant usually reaches up to 6 meters in height and width, although it can occasionally grow as tall as 10 meters. Its dense and fibrous root system makes it well-suited for bioengineering applications, especially in buffer strips, where it contributes to streambank stabilization and erosion control. Sambucus nigra is particularly suitable for buffer strips near agricultural fields because it helps filter surface runoff, trap sediments, and absorb excess nutrients such as nitrogen and phosphorus, thereby improving water quality. Additionally, it supports local biodiversity by providing nectar, berries, and shelter for a variety of birds and insects, enhancing the ecological function of agricultural and riparian landscapes.</p>
-
-<p> VIBURNUM OPULUS (Guelder rose):<p>
-<p style="margin: 0;">Viburnum opulus, commonly known as Guelder rose, is a deciduous shrub native to wetlands and river margins, characterized by moderate growth, good shade tolerance, and fibrous roots that improve soil cohesion. It typically reaches 2 to 4 meters in height and 2 to 3 meters in width, forming a dense, rounded crown. This shrub is widely used in ecological restoration and bioengineering to stabilize riparian edges because its root system reduces erosion and enhances soil structure, while its dense canopy filters sediments and excess nutrients from runoff, thereby improving water quality. Additionally, Viburnum opulus supports biodiversity by providing food and habitat for birds and small mammals, making it an excellent choice for buffer strips in riparian zones.</p>
-
-<p> ULMUS LAEVIS (European White Elm):<p>
-<p style="margin: 0;">Ulmus laevis, a native elm tree commonly found in floodplain forests, typically grows between 20 and 30 meters tall with a broad, spreading crown. It is tolerant of periodic waterlogging and develops a deep, extensive root system that is highly effective for stabilizing soil in wetland-adjacent areas. Despite its sensitivity to Dutch elm disease, Ulmus laevis plays a crucial role in the long-term stabilization of buffer zones by anchoring soils prone to erosion and by improving soil structure. Its large canopy also provides important habitat and shade, which helps maintain cooler microclimates and supports diverse wildlife in riparian buffers, making it an essential species for ecological restoration and maintaining the integrity of these sensitive environments.</p>
-
-<p> ALNUS GLUTINOSA (Black Alder):<p>
-<p style="margin: 0;">Alnus glutinosa (Black Alder) is a fast-growing, nitrogen-fixing tree species commonly found along riverbanks and in wetlands. It typically reaches heights of 15 to 25 meters, with a broad, rounded crown. This species rapidly colonizes disturbed areas, improving soil fertility through nitrogen fixation and developing extensive root systems that strongly reinforce streambanks. In buffer zones, Alnus glutinosa is especially valuable for stabilizing flood-prone areas by reducing erosion and increasing soil cohesion. Moreover, it enhances nutrient cycling by enriching the soil, which benefits surrounding vegetation and contributes to overall ecosystem health and resilience in riparian zones.</p>
-
-<p> CAREX RIPARIA (Greater Pond Sedge):<p>
-<p style="margin: 0;">Carex riparia is a robust, perennial sedge that thrives in saturated soils along riverbanks and wetland margins. It grows up to 1.2 meters in height, forming dense clumps and horizontal rhizome networks that provide excellent soil reinforcement and slope protection. Its dense vegetative cover traps sediments and filters nutrients from surface runoff, making it highly effective in buffer strips designed to reduce water pollution and control erosion.</p>
-
-<p> JUNCUS EFFUSUS (Soft Rush):<p>
-<p style="margin: 0;">Juncus effusus is a clump-forming rush that grows in waterlogged or poorly drained soils, typically reaching 0.5 to 1.5 meters in height. It is widely used in constructed wetlands and riparian buffers due to its ability to stabilize saturated soils, absorb excess nutrients such as nitrogen and phosphorus, and slow down water flow, helping to trap sediments. Its upright structure and adaptability to fluctuating water levels make it a valuable component in riparian bioengineering.</p>
-
-<p> FILIPENDULA ULMARIA (Meadowsweet):<p>
-<p style="margin: 0;">Filipendula ulmaria is a tall, herbaceous perennial native to moist meadows and riparian zones, growing up to 1.5 to 2 meters in height. It develops a fibrous root system that enhances soil cohesion, and its high transpiration rate helps regulate water balance in wet environments. In addition to its physical contributions to stabilization, it supports pollinators and adds floral diversity, making it ideal for buffer strips where ecological value is also a priority.</p>
-
-<p> LYTHRUM SALICARIA (Purple Loosestrife):<p>
-<p style="margin: 0;">Lythrum salicaria is a vigorous perennial herb that can grow between 1 and 2 meters tall, forming dense stands with deep, fibrous roots. These characteristics make it effective in erosion control and nutrient retention, especially in wetland and riparian zones. While it can be invasive in some non-native regions, in its native European range it is considered ecologically valuable when managed properly. It is particularly suitable for buffer strips focused on water quality improvement and riparian habitat restoration.</p>`,
-
-  "Sambucus nigra, Quercus robur, Festuca pratensis, Lotus corniculatus, Achillea millefolium, Plantago lanceolata": `
-<p> SAMBUCUS NIGRA (Black Elder):<p>
-<p style="margin: 0;">Sambucus nigra, commonly known as elderberry, is a fast-growing deciduous shrub or small tree typically found in hedgerows and areas with moist, nutrient-rich soils. It thrives in a wide range of conditions, from periodically flooded zones to drier fertile soils, particularly in sunny environments. The plant usually reaches up to 6 meters in height and width, although it can occasionally grow as tall as 10 meters. Its dense and fibrous root system makes it well-suited for bioengineering applications, especially in buffer strips, where it contributes to streambank stabilization and erosion control. Sambucus nigra is particularly suitable for buffer strips near agricultural fields because it helps filter surface runoff, trap sediments, and absorb excess nutrients such as nitrogen and phosphorus, thereby improving water quality. Additionally, it supports local biodiversity by providing nectar, berries, and shelter for a variety of birds and insects, enhancing the ecological function of agricultural and riparian landscapes.</p>
-
-<p> QUERCUS ROBUR (English oak):<p>
-<p>Quercus robur (English oak) is a long-lived deciduous tree that can reach heights of 20–40 meters with a broad canopy. It has a deep and extensive root system, which helps stabilize soil and reduce erosion along riparian zones. Although it establishes more slowly than shrubs, its long lifespan provides sustained protection and ecological benefits. As a keystone species in buffer strips, Quercus robur supports high biodiversity by offering habitat and food for numerous insects, birds, and mammals. Its presence enhances soil structure and nutrient cycling, making it highly suitable for promoting long-term riparian zone stability and ecosystem health.</p>
-
-<p> FESTUCA PRATENSIS (Meadow Fescue):<p>
-<p style="margin: 0;">Festuca pratensis is a perennial grass that grows up to 0.6 to 1 meter tall, forming dense sod with strong, fibrous roots that enhance surface soil stability. Adapted to moist, fertile soils, it is widely used in seed mixes for erosion control. In buffer strips, its dense foliage improves water infiltration, reduces surface runoff, and supports soil conservation in agricultural landscapes.</p>
-
-<p> LOTUS CORNICULATUS (Bird’s-foot Trefoil):<p>
-<p style="margin: 0;">Lotus corniculatus is a low-growing legume, typically reaching 20 to 40 cm in height, with a spreading habit that provides excellent ground cover. Its nitrogen-fixing ability improves soil fertility, while its drought tolerance and capacity to stabilize erosion-prone slopes make it a key species in buffer zones and revegetation efforts. It also promotes plant diversity and supports pollinators and beneficial insects.</p>
-
-<p> ACHILLEA MILLEFOLIUM (Yarrow):<p>
-<p style="margin: 0;">Achillea millefolium is a hardy perennial herb growing up to 0.6 to 0.8 meters tall, with deep, fibrous roots that provide excellent soil stabilization, even in nutrient-poor or dry soils. Its dense growth helps suppress invasive species, while its abundant flowers support pollinator populations. In buffer strips, it contributes to biodiversity, resilience, and low-maintenance vegetation structure.</p>
-
-<p> PLANTAGO LANCEOLATA (Ribwort Plantain):<p>
-<p style="margin: 0;">Plantago lanceolata is a durable, perennial herb with a deep taproot system and rosettes of leaves typically growing up to 30–50 cm tall. Tolerant of poor soils, trampling, and drought, it binds soil effectively and thrives in mixed grassland plantings. In buffer strips, it is especially useful on dry or compacted margins, where other species may struggle, offering consistent erosion control and habitat for invertebrates.</p>`,
-
-  "Festuca ovina, Anthyllis vulneraria, Bromus erectus, Poa angustifolia": `
-<p> FESTUCA OVINA (Sheep’s Fescue):<p>
-<p style="margin: 0;">Festuca ovina is a fine-leaved perennial grass that grows in dense tufts, typically reaching 20 to 40 cm in height. It is highly drought-tolerant and thrives in dry, nutrient-poor, and sandy or calcareous soils. Its deep fibrous roots make it particularly effective for slope stabilization and surface erosion control in grassland buffer strips. Its competitive growth and low maintenance requirements are ideal for low-input revegetation.</p>
-
-<p> ANTHYLLIS VULNERARIA (Kidney Vetch):<p>
-<p style="margin: 0;">Anthyllis vulneraria is a low-growing legume that typically reaches 20 to 50 cm in height, with a deep and strong taproot system. It is adapted to dry, calcareous soils and is highly drought-resistant. As a nitrogen-fixer, it improves soil fertility and supports pollinators, especially bees. It is widely used in slope stabilization and ecological restoration, particularly in buffer areas exposed to dry conditions and poor soils.</p>
-
-<p> BROMUS ERECTUS (Upright Brome):<p>
-<p style="margin: 0;">Bromus erectus is a robust perennial bunchgrass growing up to 0.6 to 1 meter in height, with a dense, fibrous root system. Native to dry grasslands and calcareous soils, it provides excellent soil binding capacity, enhances plant structure, and persists under low moisture conditions. In buffer strips, it helps maintain soil integrity, especially on dry slopes or marginal zones, and supports species diversity in dry meadows.</p>
-
-<p> POA ANGUSTIFOLIA (Narrow-leaved Meadow-grass):<p>
-<p style="margin: 0;">Poa angustifolia is a tuft-forming perennial grass with narrow leaves and fine, fibrous roots. It typically reaches 30 to 60 cm in height, and is well adapted to dry, low-fertility soils. Its compact growth and drought tolerance make it suitable for stabilizing slopes and field margins in dry parts of buffer zones. It is often used in low-maintenance grassland mixes for erosion control and landscape restoration.</p>`
-};
-     
-      // Output
-      let descriptionText = "";
-if (vegetationDescriptions[vegetation]) {
-  descriptionText = `<br><strong>Vegetation Details:</strong> ${vegetationDescriptions[vegetation]}`;
-}
-
-document.getElementById("output").innerHTML =
-  `<strong>Your Input:</strong><br>` +
-  `• Field Slope: ${slopeText}<br>` +
-  `• Fertilizer Use: ${fertilizer}<br>` +
-  `• Soil Type: ${soil}<br>` +
-  `• Precipitation Intensity: ${rain}<br>` +
-  `• Distance to Water Body: ${distanceText}<br><br>` +
-  `<strong>Minimum Buffer Width Requirement:</strong> ${width}<br>` +
-  `<strong>Suggested Vegetation:</strong> ${vegetation}` +
-  descriptionText;
+      document.getElementById("output").innerHTML = `
+        <p><strong>Recommended Buffer Width:</strong> ${width}</p>
+        <p><strong>Recommended Vegetation:</strong> ${vegetationKey}</p>
+        ${vegetationHTML}
+      `;
     }
   </script>
 </body>
 </html>
+
